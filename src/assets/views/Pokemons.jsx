@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const Pokemons = () => {
   const [data, setData] = useState({});
+
+  const { name } = useParams();
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -9,7 +12,7 @@ const Pokemons = () => {
 
     const fetchData = async () => {
       try {
-        const url = "https://pokeapi.co/api/v2/pokemon?limit=151";
+        const url = `https://pokeapi.co/api/v2/pokemon/${name}`;
         const response = await fetch(url, { signal });
         const jsonData = await response.json();
         setData(jsonData);
@@ -23,7 +26,7 @@ const Pokemons = () => {
     return () => {
       abortController.abort();
     };
-  }, []); // La dependencia está vacía ya que solo se carga una vez al montar el componente
+  }, [name]);
 
   return (
     <div>
@@ -31,13 +34,10 @@ const Pokemons = () => {
         <p>Error: {data.errorMessage}</p>
       ) : (
         <div>
-          <h1>Lista de Pokémones</h1>
-          <ul>
-            {data.results &&
-              data.results.map((pokemon) => (
-                <li key={pokemon.name}>{pokemon.name}</li>
-              ))}
-          </ul>
+          <h1>{data.name}</h1>
+          <img src={data.sprites?.front_default} alt={data.name} />
+          <p>Height: {data.height}</p>
+          <p>Weight: {data.weight}</p>
         </div>
       )}
     </div>
@@ -45,3 +45,4 @@ const Pokemons = () => {
 };
 
 export default Pokemons;
+
